@@ -1,9 +1,10 @@
-// Options_PropertyBasedTest_MathsOptimization.cpp
+// OptionValuationTests.cpp
 #include <iostream>
 #include <cmath>
 #include <cassert>
 #include <vector>
 #include <algorithm>
+#include <random>
 
 const double PI = 3.14159265358979323846;
 
@@ -97,8 +98,36 @@ void test_diverse_set() {
     std::cout << "[PASS] Diverse test cases executed.\n";
 }
 
+void randomized_tests(int count = 100) {
+    std::default_random_engine gen;
+    std::uniform_real_distribution<double> dist_S(50, 150);
+    std::uniform_real_distribution<double> dist_K(50, 150);
+    std::uniform_real_distribution<double> dist_T(0.01, 2);
+    std::uniform_real_distribution<double> dist_r(0.0, 0.1);
+    std::uniform_real_distribution<double> dist_sigma(0.1, 0.5);
+    std::uniform_int_distribution<int> dist_type(0, 1);
+
+    for (int i = 0; i < count; ++i) {
+        double S = dist_S(gen);
+        double K = dist_K(gen);
+        double T = dist_T(gen);
+        double r = dist_r(gen);
+        double sigma = dist_sigma(gen);
+        char type = dist_type(gen) == 0 ? 'C' : 'P';
+
+        try {
+            double price = black_scholes(S, K, T, r, sigma, type);
+            assert(price >= 0);
+        } catch (...) {
+            std::cerr << "[FAIL] Error with input: (" << S << ", " << K << ", " << T << ", " << r << ", " << sigma << ", " << type << ")\n";
+        }
+    }
+    std::cout << "[PASS] Randomized tests executed.\n";
+}
+
 int main() {
     property_tests();
     test_diverse_set();
+    randomized_tests();
     return 0;
 }
